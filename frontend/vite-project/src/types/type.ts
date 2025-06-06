@@ -22,6 +22,12 @@ export type ParaExpense = {
   Note: String;
 };
 
+export type APIParam = {
+  category?: string;
+  time?: string;
+  payment?: string;
+}
+
 export const CategoryType = z.enum([
   "Rental",
   "Groceries",

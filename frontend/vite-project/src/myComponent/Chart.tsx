@@ -113,11 +113,11 @@ export const Chart = ({ expenses }: { expenses: Expense[] }) => {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Bar dataKey="Rental" stackId="a" fill="#ed3306 " />
-          <Bar dataKey="Groceries" stackId="a" fill="#06ed4f" />
-          <Bar dataKey="Entertainment" stackId="a" fill="#ed06d8 " />
-          <Bar dataKey="Travel" stackId="a" fill="#3710e5 " />
-          <Bar dataKey="Others" stackId="a" fill="#0dbfbf" />
+          <Bar dataKey="Rental" stackId="a" fill="#ff876a" />
+          <Bar dataKey="Groceries" stackId="a" fill="#a3e78e" />
+          <Bar dataKey="Entertainment" stackId="a" fill="#de8ee7" />
+          <Bar dataKey="Travel" stackId="a" fill="#83baf9" />
+          <Bar dataKey="Others" stackId="a" fill="#e7fa45" />
         </BarChart>
       </div>
     </div>

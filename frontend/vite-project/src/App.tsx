@@ -3,7 +3,7 @@ import { DataEntry } from "./myComponent/DataEntry";
 import { CurrentExpense } from "./myComponent/CurrentExpense";
 import { Filters } from "./myComponent/Filters";
 import { useEffect, useState } from "react";
-import { ExpenseArraySchema, type Expense, type ParaExpense } from "./types/type";
+import { ExpenseArraySchema, type APIParam, type Expense, type ParaExpense } from "./types/type";
 
 
 function App() {
@@ -20,7 +20,14 @@ function App() {
     fetchData();
   }, [])
 
-  function addExpenses(state: ParaExpense) {
+  const addExpenses = async (state: ParaExpense) => {
+    await fetch('http://localhost:3000/add-expenses', { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(state)
+    });
     const newItem = {
       key: expenses.length,
       Category: state.Category,
@@ -32,13 +39,26 @@ function App() {
     setExpenses([...expenses, newItem]);
   };
 
+  const handleAPICall = async (body: APIParam) => {
+    const response = await fetch('http://localhost:3000/filter-expenses', { 
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body)
+    });
+    const jsonResponse = await response.json();
+    const parsedResponse = await ExpenseArraySchema.parseAsync(jsonResponse.data);
+    setExpenses(parsedResponse);
+  }
+
   return (
     <div className="flex flex-col">
       <div className="h-full w-full flex flex-col lg:flex-row">
         {/* Left Column */}
         <div className="flex p-6 flex-col justify-center w-full lg:w-1/3 gap-3">
           <DataEntry addExpenses={addExpenses} />
-          <Filters />
+          <Filters handleAPICall={handleAPICall} />
         </div>
         {/* Current Expense - Stacks on mobile */}
         <div className="flex flex-col p-6 justify-center gap-3 w-full lg:w-2/3">

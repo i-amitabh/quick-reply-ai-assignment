@@ -7,9 +7,45 @@ export function Filters({
 }: {
   handleAPICall: (body: APIParam) => Promise<void>;
 }) {
-  const [time, setTime] = useState("");
-  const [category, setCategory] = useState("");
-  const [payment, setPayment] = useState("");
+  const [time, setTime] = useState<String>("All Time");
+  const [category, setCategory] = useState<String[]>([]);
+  const [payment, setPayment] = useState<String[]>([]);
+
+
+  const handleTime = (param: String) => {
+    setTime(param);
+  }
+
+  const handleCategory = (param: String) => {
+    if(param === 'All') {
+      if(category.includes('All')) {
+        setCategory(category.filter((category) => category !== param));
+      } else {
+        setCategory(['All']);
+      }
+    }
+    else if(category.includes(param)) {
+      setCategory(category.filter((category) => category !== param));
+    } else {
+      setCategory([...category, param]);
+    }
+  }
+
+  const handlePayment = (param: String) => {
+    if(payment.includes(param)) {
+      setPayment(payment.filter((payment) => payment !== param));
+    } else {
+      setPayment([...payment, param]);
+    }
+  }
+
+  const handleSubmit = () => {
+    handleAPICall({
+      category: category,
+      time: time,
+      payment: payment
+    });
+  }
 
   return (
     <div className="flex flex-col gap-3 bg-gray-100 rounded-lg p-4">
@@ -18,19 +54,22 @@ export function Filters({
       {/* Time Range Buttons */}
       <div className="flex flex-wrap gap-3">
         <Button
-          onClick={() => handleAPICall({ time: "All Time" })}
+          onClick={() => handleTime("All Time")}
+          disabled={time === 'All Time'}
           variant="outline"
         >
           All Time
         </Button>
         <Button
-          onClick={() => handleAPICall({ time: "Last 7 days" })}
+          onClick={() => handleTime("Last 7 days")}
+          disabled={time === 'Last 7 days'}
           variant="outline"
         >
           Last 7 days
         </Button>
         <Button
-          onClick={() => handleAPICall({ time: "Last 30 days" })}
+          onClick={() => handleTime("Last 30 days")}
+          disabled={time === 'Last 30 days'}
           variant="outline"
         >
           Last 30 days
@@ -42,38 +81,43 @@ export function Filters({
         <h2>Category</h2>
         <div className="flex flex-wrap gap-3">
           <Button
-            onClick={() => handleAPICall({ category: "All" })}
-            variant="outline"
+            onClick={() => handleCategory('All')}
+            variant={category.includes('All') ? 'default' : "outline"}
           >
             All
           </Button>
           <Button
-            onClick={() => handleAPICall({ category: "Rental" })}
-            variant="outline"
+            onClick={() => handleCategory('Rental')}
+            disabled={category.includes('All')}
+            variant={category.includes('Rental') ? 'default' : "outline"}
           >
             Rental
           </Button>
           <Button
-            onClick={() => handleAPICall({ category: "Groceries" })}
-            variant="outline"
+            onClick={() => handleCategory('Groceries')}
+            disabled={category.includes('All')}
+            variant={category.includes('Groceries') ? 'default' : "outline"}
           >
             Groceries
           </Button>
           <Button
-            onClick={() => handleAPICall({ category: "Travel" })}
-            variant="outline"
+            onClick={() => handleCategory('Travel')}
+            disabled={category.includes('All')}
+            variant={category.includes('Travel') ? 'default' : "outline"}
           >
             Travel
           </Button>
           <Button
-            onClick={() => handleAPICall({ category: "Entertainment" })}
-            variant="outline"
+            onClick={() => handleCategory('Entertainment')}
+            disabled={category.includes('All')}
+            variant={category.includes('Entertainment') ? 'default' : "outline"}
           >
             Entertainment
           </Button>
           <Button
-            onClick={() => handleAPICall({ category: "Other" })}
-            variant="outline"
+            onClick={() => handleCategory('Other')}
+            disabled={category.includes('All')}
+            variant={category.includes('Other') ? 'default' : "outline"}
           >
             Other
           </Button>
@@ -85,31 +129,33 @@ export function Filters({
         <h2>Payment Method</h2>
         <div className="flex flex-wrap gap-3">
           <Button
-            onClick={() => handleAPICall({ payment: "Credit Card" })}
-            variant="outline"
+            onClick={() => handlePayment("Credit Card")}
+            variant={payment.includes('Credit Card') ? 'default' : "outline"}
           >
             Credit Card
           </Button>
           <Button
-            onClick={() => handleAPICall({ payment: "Net Banking" })}
-            variant="outline"
+            onClick={() => handlePayment("Net Banking")}
+            variant={payment.includes('Net Banking') ? 'default' : "outline"}
           >
             Net Banking
           </Button>
           <Button
-            onClick={() => handleAPICall({ payment: "UPI" })}
-            variant="outline"
+            onClick={() => handlePayment("UPI")}
+            variant={payment.includes('UPI') ? 'default' : "outline"}
           >
             UPI
           </Button>
           <Button
-            onClick={() => handleAPICall({ payment: "Cash" })}
-            variant="outline"
+            onClick={() => handlePayment("Cash")}
+            variant={payment.includes('Cash') ? 'default' : "outline"}
           >
             Cash
           </Button>
         </div>
       </div>
+
+      <Button onClick={handleSubmit}>Apply Filter</Button>
     </div>
   );
 }

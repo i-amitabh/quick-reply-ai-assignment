@@ -23,9 +23,9 @@ export type ParaExpense = {
 };
 
 export type APIParam = {
-  category?: string;
-  time?: string;
-  payment?: string;
+  category?: String[];
+  time?: String;
+  payment?: String[];
 }
 
 export const CategoryType = z.enum([

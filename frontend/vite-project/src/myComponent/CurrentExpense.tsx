@@ -11,18 +11,18 @@ import {
 import type { Expense } from "../types/type";
 
 export function CurrentExpense({ expenses }: { expenses: Expense[] }) {
-  // Calculate total amount
-  const totalAmount = expenses.reduce(
-    (sum, expense) => sum + expense.amount,
-    0
-  );
-
-  /* HTML: <div class="loader"></div> */
+  let totalAmount;
+  if(expenses !== undefined) {
+    totalAmount = expenses.reduce(
+      (sum, expense) => sum + expense.amount,
+      0
+    );
+  }
 
   return (
     <div className="bg-gray-100 rounded-lg p-4 max-h-[400px] min-h-[400px] overflow-auto">
       <h1 className="text-xl font-medium mb-3">Your Expenses</h1>
-      {expenses.length > 0 ? (
+      {expenses != undefined ? (
         <Table>
           <TableHeader>
             <TableRow>
@@ -48,7 +48,7 @@ export function CurrentExpense({ expenses }: { expenses: Expense[] }) {
             <TableRow>
               <TableCell colSpan={4}>Total</TableCell>
               <TableCell className="text-right">
-                ₹{totalAmount.toFixed(2)}
+                ₹{totalAmount ? totalAmount : 0}
               </TableCell>
             </TableRow>
           </TableFooter>

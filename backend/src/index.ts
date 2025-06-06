@@ -23,11 +23,11 @@ app.get("/get-expenses", async (req: Request, res: Response) => {
       success: true,
       data: expenses.rows,
     });
-  } catch(e) {
-    console.log('error', e);
+  } catch (e) {
+    console.log("error", e);
     res.json({
       success: false,
-      message: 'Something went wrong while getting expenses'
+      message: "Something went wrong while getting expenses",
     });
   }
 });
@@ -42,74 +42,69 @@ app.post("/add-expenses", async (req: Request, res: Response) => {
       VALUES ($1, $2, $3, $4, $5)`,
       [date, category, payment, amount, note]
     );
-  } catch(e) {
+  } catch (e) {
     res.json({
       success: false,
-      message: 'Something went wrong while entering expenses'
+      message: "Something went wrong while entering expenses",
     });
   }
 
-  let expenses;
   try {
-    expenses =  await pool.query(`SELECT * FROM expenses`);
-  } catch(e) {
+    const expenses = await pool.query(`SELECT * FROM expenses`);
+    res.json({
+      success: true,
+      data: expenses?.rows,
+    });
+  } catch (e) {
     res.json({
       success: false,
-      message: 'Something went wrong while getting expenses'
+      message: "Something went wrong while getting expenses",
     });
   }
-
-  res.json({
-    success: true,
-    data: expenses?.rows,
-  });
 });
 
-app.post("/filter-expenses", (req: Request, res: Response) => {
+app.post("/filter-expenses", async (req: Request, res: Response) => {
   const { time, category, payment } = req.body;
-  let resultData = [...data]; // Start with all data
 
-  // Apply category filter if present and not "All"
-  if (category && category !== "All") {
-    resultData = resultData.filter((expense) => expense.Category === category);
+  let startTime = "1900-01-01";
+  let endTime = formatDate(new Date());
+
+  const daysAgo = new Date();
+  if (time === "Last 7 days") {
+    daysAgo.setDate(new Date().getDate() - 6);
+    startTime = formatDate(daysAgo);
+  } else if (time === "Last 30 days") {
+    daysAgo.setDate(new Date().getDate() - 30);
+    startTime = formatDate(daysAgo);
   }
 
-  // Apply time filter if present and not "All Time"
-  if (time && time !== "All Time") {
-    const today = new Date();
-    let startDate: string;
-
-    if (time === "Last 7 days") {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(today.getDate() - 6);
-      startDate = formatDate(sevenDaysAgo);
-    } else if (time === "Last 30 days") {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(today.getDate() - 29);
-      startDate = formatDate(thirtyDaysAgo);
-    } else {
-      // Handle unknown time values or fallback to no filtering
-      startDate = formatDate(new Date(0)); // Very old date
+  try {
+    let query = `SELECT *
+      FROM expenses
+      WHERE TO_DATE(Date, 'YYYY-MM-DD') BETWEEN $1 AND $2`;
+    const params = [startTime, endTime];
+  
+    if (Array.isArray(category) && category.length > 0 && !category.includes('All')) {
+      const categoryPlaceholders = category.map((_, i) => `$${params.length + 1 + i}`).join(',');
+      query += ` AND category IN (${categoryPlaceholders})`;
+      params.push(...category);
     }
 
-    const endDate = formatDate(today);
-    resultData = resultData.filter(
-      (item) => item.Date >= startDate && item.Date <= endDate
-    );
+    if (Array.isArray(payment) && payment.length > 0) {
+      const paymentPlaceholders = payment.map((_, i) => `$${params.length + 1 + i}`).join(',');
+      query += ` AND payment IN (${paymentPlaceholders})`;
+      params.push(...payment);
+    }
+  
+    const response = await pool.query(query, params);
+    res.json({ success: true, data: response.rows });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong while querying data"
+    });
   }
-
-  // Apply payment method filter if present
-  if (payment) {
-    resultData = resultData.filter(
-      (expense) => expense.PaymentMethod === payment
-    );
-  }
-
-  // Return filtered results
-  res.json({
-    success: true,
-    data: resultData,
-  });
 });
 
 app.listen(PORT, () => {

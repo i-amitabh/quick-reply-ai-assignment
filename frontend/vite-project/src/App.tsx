@@ -13,9 +13,11 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       const response = await fetch('http://localhost:3000/get-expenses');
-      const cleanedResponse = await response.json();
-      const parsedResponse = await ExpenseArraySchema.parseAsync(cleanedResponse.data);
-      setExpenses(parsedResponse);
+      const jsonResponse = await response.json();
+      if(jsonResponse.success) {
+        const parsedResponse = await ExpenseArraySchema.parseAsync(jsonResponse.data);
+        setExpenses([...parsedResponse]);
+      }
     }
     fetchData();
   }, [])
@@ -45,8 +47,10 @@ function App() {
       body: JSON.stringify(body)
     });
     const jsonResponse = await response.json();
-    const parsedResponse = await ExpenseArraySchema.parseAsync(jsonResponse.data);
-    setExpenses(parsedResponse);
+    if(jsonResponse.success) {
+      const parsedResponse = await ExpenseArraySchema.parseAsync(jsonResponse.data);
+      setExpenses(parsedResponse);
+    }
   }
 
   return (

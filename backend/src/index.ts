@@ -17,30 +17,30 @@ const formatDate = (date: Date) => {
 };
 
 app.get("/get-expenses", async (req: Request, res: Response) => {
-  let expenses;
   try {
-    expenses =  await pool.query(`SELECT * FROM expenses`);
+    const expenses = await pool.query(`SELECT * FROM expenses`);
+    res.json({
+      success: true,
+      data: expenses.rows,
+    });
   } catch(e) {
+    console.log('error', e);
     res.json({
       success: false,
       message: 'Something went wrong while getting expenses'
     });
   }
-  res.json({
-    success: true,
-    data: expenses?.rows,
-  });
 });
 
 app.post("/add-expenses", async (req: Request, res: Response) => {
-  const { Category, PaymentMethod, Amount, Note } = req.body;
+  const { category, payment, amount, note } = req.body;
   const date = formatDate(new Date());
 
   try {
     await pool.query(
       `INSERT INTO expenses (Date, Category, Payment, Amount, Note)
       VALUES ($1, $2, $3, $4, $5)`,
-      [date, Category, PaymentMethod, Amount, Note]
+      [date, category, payment, amount, note]
     );
   } catch(e) {
     res.json({

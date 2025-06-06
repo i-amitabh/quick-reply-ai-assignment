@@ -8,48 +8,49 @@ import {
   SelectValue,
 } from "../components/ui/select";
 import { Button } from "../components/ui/button";
-import type { CategoryType, ParaExpense, PaymentMethodType } from "../App";
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import type { CategoryType, ParaExpense, PaymentMethodType } from "../types/type";
 
 export const DataEntry = ({
   addExpenses,
 }: {
   addExpenses: (expense: ParaExpense) => void;
 }) => {
-  // Use primitive string type instead of String object wrapper
   const [category, setCategory] = useState<string>("");
   const [payment, setPayment] = useState<string>("");
   const [amount, setAmount] = useState<number>(0);
   const [note, setNote] = useState<string>("");
+
+  const isAvailable = useMemo(() => {
+    return category.length > 0 && 
+           payment.length > 0 && 
+           amount > 0 && 
+           note.length > 0;
+  }, [category, payment, amount, note]);
 
   const handleNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setNote(e.target.value);
   };
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Use parseFloat to handle decimals
     setAmount(parseFloat(e.target.value) || 0);
   };
 
   const handleSubmit = () => {
-    // Ensure both category and payment are selected
     if (!category || !payment) {
       alert("Please select both category and payment method");
       return;
     }
 
-    // Create new expense object
     const newExpense: ParaExpense = {
       category: category as CategoryType,
       payment: payment as PaymentMethodType,
       note: note,
-      amount: amount,// Add current date
+      amount: amount,
     };
 
-    // Add to expenses
     addExpenses(newExpense);
-    
-    // Reset form
+
     setCategory("");
     setPayment("");
     setAmount(0);
@@ -61,7 +62,6 @@ export const DataEntry = ({
       <h1 className="text-xl font-medium">Add Expense</h1>
       
       <div className="flex gap-3">
-        {/* Category Select */}
         <div className="grid w-full max-w-sm items-center gap-3">
           <Label>Category</Label>
           <Select value={category} onValueChange={setCategory}>
@@ -78,7 +78,6 @@ export const DataEntry = ({
           </Select>
         </div>
 
-        {/* Payment Method Select */}
         <div className="grid w-full max-w-sm items-center gap-3">
           <Label>Payment Method</Label>
           <Select value={payment} onValueChange={setPayment}>
@@ -95,7 +94,6 @@ export const DataEntry = ({
         </div>
       </div>
 
-      {/* Amount Input */}
       <div className="grid w-full max-w-sm items-center gap-3">
         <Label>Amount</Label>
         <Input
@@ -106,7 +104,6 @@ export const DataEntry = ({
         />
       </div>
 
-      {/* Notes Input */}
       <div className="grid w-full max-w-sm items-center gap-3">
         <Label>Notes</Label>
         <Input 
@@ -117,7 +114,7 @@ export const DataEntry = ({
         />
       </div>
 
-      <Button onClick={handleSubmit}>Add Expense</Button>
+      <Button disabled={!isAvailable} onClick={handleSubmit}>Add Expense</Button>
     </div>
   );
 };

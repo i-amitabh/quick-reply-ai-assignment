@@ -8,18 +8,18 @@ export type CategoryType =
   | "Others";
 export type PaymentMethodType = "UPI" | "Credit Card" | "Net Banking" | "Cash";
 export type Expense = {
-  key: number;
-  Category: CategoryType;
-  PaymentMethod: PaymentMethodType;
-  Amount: number;
-  Date: String;
-  Note: String;
+  id: number;
+  category: CategoryType;
+  payment: PaymentMethodType;
+  amount: number;
+  date: String;
+  note: String;
 };
 export type ParaExpense = {
-  Category: CategoryType;
-  PaymentMethod: PaymentMethodType;
-  Amount: number;
-  Note: String;
+  category: CategoryType;
+  payment: PaymentMethodType;
+  amount: number;
+  note: String;
 };
 
 export type APIParam = {
@@ -45,15 +45,15 @@ export const PaymentMethodType = z.enum([
 ]);
 
 export const ExpenseSchema = z.object({
-  key: z.number().int().positive(),
-  Category: CategoryType,
-  PaymentMethod: PaymentMethodType,
-  Amount: z.number().positive(),
+  id: z.number().int().positive(),
+  category: CategoryType,
+  payment: PaymentMethodType,
+  amount: z.number().positive(),
   // Date: z.string().datetime({ offset: true }).refine(str => !isNaN(new Date(str).getTime()), {
   //   message: "Invalid date format"
   // }),
-  Date: z.string(),
-  Note: z.string()
+  date: z.string(),
+  note: z.string()
 });
 
 export const ExpenseArraySchema = z.array(ExpenseSchema);

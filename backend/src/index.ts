@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import { data } from "./data";
 import cors from "cors";
+import pool from "./db";
 
 const app = express();
 const PORT = 3000;
@@ -8,18 +9,59 @@ const PORT = 3000;
 app.use(cors());
 app.use(express.json());
 
-app.get("/get-expenses", (req: Request, res: Response) => {
+const formatDate = (date: Date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+app.get("/get-expenses", async (req: Request, res: Response) => {
+  let expenses;
+  try {
+    expenses =  await pool.query(`SELECT * FROM expenses`);
+  } catch(e) {
+    res.json({
+      success: false,
+      message: 'Something went wrong while getting expenses'
+    });
+  }
   res.json({
     success: true,
-    data: data,
+    data: expenses?.rows,
   });
 });
 
-app.post("/add-expenses", (req: Request, res: Response) => {
-  console.log(req.body);
+app.post("/add-expenses", async (req: Request, res: Response) => {
+  const { Category, PaymentMethod, Amount, Note } = req.body;
+  const date = formatDate(new Date());
+
+  try {
+    await pool.query(
+      `INSERT INTO expenses (Date, Category, Payment, Amount, Note)
+      VALUES ($1, $2, $3, $4, $5)`,
+      [date, Category, PaymentMethod, Amount, Note]
+    );
+  } catch(e) {
+    res.json({
+      success: false,
+      message: 'Something went wrong while entering expenses'
+    });
+  }
+
+  let expenses;
+  try {
+    expenses =  await pool.query(`SELECT * FROM expenses`);
+  } catch(e) {
+    res.json({
+      success: false,
+      message: 'Something went wrong while getting expenses'
+    });
+  }
+
   res.json({
     success: true,
-    data: req.body,
+    data: expenses?.rows,
   });
 });
 
@@ -27,17 +69,9 @@ app.post("/filter-expenses", (req: Request, res: Response) => {
   const { time, category, payment } = req.body;
   let resultData = [...data]; // Start with all data
 
-  // Helper function to format dates as YYYY-MM-DD (local time)
-  const formatDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const day = String(date.getDate()).padStart(2, "0");
-    return `${year}-${month}-${day}`;
-  };
-
   // Apply category filter if present and not "All"
   if (category && category !== "All") {
-    resultData = resultData.filter(expense => expense.Category === category);
+    resultData = resultData.filter((expense) => expense.Category === category);
   }
 
   // Apply time filter if present and not "All Time"
@@ -59,22 +93,22 @@ app.post("/filter-expenses", (req: Request, res: Response) => {
     }
 
     const endDate = formatDate(today);
-    resultData = resultData.filter(item => 
-      item.Date >= startDate && item.Date <= endDate
+    resultData = resultData.filter(
+      (item) => item.Date >= startDate && item.Date <= endDate
     );
   }
 
   // Apply payment method filter if present
   if (payment) {
-    resultData = resultData.filter(expense => 
-      expense.PaymentMethod === payment
+    resultData = resultData.filter(
+      (expense) => expense.PaymentMethod === payment
     );
   }
 
   // Return filtered results
   res.json({
     success: true,
-    data: resultData
+    data: resultData,
   });
 });
 

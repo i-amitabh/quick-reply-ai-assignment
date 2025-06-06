@@ -21,22 +21,16 @@ function App() {
   }, [])
 
   const addExpenses = async (state: ParaExpense) => {
-    await fetch('http://localhost:3000/add-expenses', { 
+    const response = await fetch('http://localhost:3000/add-expenses', { 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(state)
     });
-    const newItem = {
-      key: expenses.length,
-      Category: state.Category,
-      PaymentMethod: state.PaymentMethod,
-      Date: `${new Date().getFullYear()}-${String(new Date().getMonth()).padStart(2, "0")}-${String(new Date().getDate()).padStart(2, "0")}`,
-      Note: state.Note,
-      Amount: state.Amount,
-    };
-    setExpenses([...expenses, newItem]);
+    const jsonResponse = await response.json();
+    const parsedResponse = await ExpenseArraySchema.parseAsync(jsonResponse.data);
+    setExpenses(parsedResponse);
   };
 
   const handleAPICall = async (body: APIParam) => {

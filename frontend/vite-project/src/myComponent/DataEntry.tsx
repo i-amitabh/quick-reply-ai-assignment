@@ -40,10 +40,10 @@ export const DataEntry = ({
 
     // Create new expense object
     const newExpense: ParaExpense = {
-      Category: category as CategoryType,
-      PaymentMethod: payment as PaymentMethodType,
-      Note: note,
-      Amount: amount,// Add current date
+      category: category as CategoryType,
+      payment: payment as PaymentMethodType,
+      note: note,
+      amount: amount,// Add current date
     };
 
     // Add to expenses

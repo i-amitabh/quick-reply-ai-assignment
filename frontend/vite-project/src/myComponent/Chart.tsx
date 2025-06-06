@@ -8,7 +8,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-import type { Expense } from "../App";
+import type { Expense } from "../types/type";
 
 type ResultData = {
   currMonth: String;
@@ -47,10 +47,10 @@ function chartData(expenses: Expense[]) {
   }
 
   for (let expense of expenses) {
-    const date = new Date(expense.Date as unknown as Date);
+    const date = new Date(expense.date as unknown as Date);
     const monthNumber = date.getMonth();
 
-    const categories = expense.Category;
+    const categories = expense.category;
 
     if (categories == "Entertainment") {
       result[monthNumber].Entertainment++;
@@ -100,7 +100,6 @@ export const Chart = ({ expenses }: { expenses: Expense[] }) => {
       className="flex flex-col gap-2 bg-gray-100 rounded-lg p-4"
     >
       <h1 className="text-xl font-medium">Analytics of your Spending</h1>
-
       <div className="w-full overflow-x-auto">
         <BarChart
           width={chartDimensions.width}

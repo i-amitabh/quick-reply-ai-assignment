@@ -5,7 +5,16 @@ import pool from "./db";
 const app = express();
 const PORT = 3000;
 
-app.use(cors());
+const allowedOrigins = [
+  'https://quick-reply-ai-assignment.vercel.app'
+];
+
+app.use(cors({
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
 app.use(express.json());
 
 const formatDate = (date: Date) => {

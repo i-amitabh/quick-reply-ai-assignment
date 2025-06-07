@@ -5,15 +5,7 @@ import pool from "./db";
 const app = express();
 const PORT = 3000;
 
-const allowedOrigins = [
-  'https://quick-reply-ai-assignment.vercel.app'
-];
-
-app.use(cors({
-  origin: allowedOrigins,
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 
 app.use(express.json());
 

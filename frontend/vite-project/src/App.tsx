@@ -5,14 +5,14 @@ import { Filters } from "./myComponent/Filters";
 import { useEffect, useState } from "react";
 import { ExpenseArraySchema, type APIParam, type Expense, type ParaExpense } from "./types/type";
 
-
 function App() {
 
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
   useEffect(() => {
+    console.log(import.meta.env.VITE_API_ENDPOINT);
     const fetchData = async () => {
-      const response = await fetch('http://localhost:3000/get-expenses');
+      const response = await fetch(`${import.meta.env.VITE_API_ENDPOINT}/get-expenses`);
       const jsonResponse = await response.json();
       if(jsonResponse.success) {
         const parsedResponse = await ExpenseArraySchema.parseAsync(jsonResponse.data);

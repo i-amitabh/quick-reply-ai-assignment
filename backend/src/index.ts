@@ -1,5 +1,4 @@
 import express, { Request, Response } from "express";
-import { data } from "./data";
 import cors from "cors";
 import pool from "./db";
 

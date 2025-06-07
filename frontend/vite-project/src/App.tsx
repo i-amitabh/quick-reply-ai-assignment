@@ -10,7 +10,6 @@ function App() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
 
   useEffect(() => {
-    console.log(import.meta.env.VITE_API_ENDPOINT);
     const fetchData = async () => {
       const response = await fetch(`${import.meta.env.VITE_API_ENDPOINT}/get-expenses`);
       const jsonResponse = await response.json();
@@ -23,7 +22,7 @@ function App() {
   }, [])
 
   const addExpenses = async (state: ParaExpense) => {
-    const response = await fetch('http://localhost:3000/add-expenses', { 
+    const response = await fetch(`${import.meta.env.VITE_API_ENDPOINT}/add-expenses`, { 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +38,7 @@ function App() {
   };
 
   const handleAPICall = async (body: APIParam) => {
-    const response = await fetch('http://localhost:3000/filter-expenses', { 
+    const response = await fetch(`${import.meta.env.VITE_API_ENDPOINT}/filter-expenses`, { 
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
